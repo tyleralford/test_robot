@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<robot name="test_robot">
+
+	<material name="blue">
+		<color rgba="0 0 1 1"/>
+	</material>
+
+	<material name="white">
+		<color rgba="1 1 1 1"/>
+	</material>
+
+	<link name="base_link">
+		<visual>
+			<geometry>
+				<box size="0.16 0.09 0.003"/>
+			</geometry>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="0.16 0.09 0.003"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="5.0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+		</inertial>
+	</link>
+
+	<link name="right_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="0.003" radius="0.035"/>
+			</geometry>
+			<origin rpy="1.570796 0 1.570796" xyz="0.002 0 0"/>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.003" radius="0.035"/>
+			</geometry>
+			<origin rpy="1.570796 0 1.570796" xyz="0.002 0 0"/>
+		</collision>
+		<inertial>
+			<mass value="0.1"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+		</inertial>
+	</link>
+
+	<link name="left_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="0.003" radius="0.035"/>
+			</geometry>
+			<origin rpy="1.570796 0 1.570796" xyz="-0.002 0 0"/>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.003" radius="0.035"/>
+			</geometry>
+			<origin rpy="1.570796 0 1.570796" xyz="-0.002 0 0"/>
+		</collision>
+		<inertial>
+			<mass value="0.1"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+		</inertial>
+	</link>
+
+	<link name="caster">
+ 		<visual>
+	        <geometry>
+				<box size="0.008 0.0098 0.04" />
+    	    </geometry>
+    	    <origin rpy="0 0 0" xyz="0 0 -0.02" />
+			<material name="blue"/>
+		</visual>
+		<collision>
+	        <geometry>
+				<box size="0.008 0.0098 0.04" />
+    	    </geometry>
+			<origin rpy="0 0 0" xyz="0 0 -0.02" />
+		</collision>
+		<inertial>
+			<mass value="0.5"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+		</inertial>
+	</link>
+
+	<joint name="base_to_right_wheel" type="continuous">
+		<axis xyz="1 0 0"/>
+		<parent link="base_link"/>
+		<child link="right_wheel"/>
+		<origin rpy="0 0 1.570796" xyz="0.01748 0.045 -0.00874"/>
+	</joint>
+
+	<joint name="base_to_left_wheel" type="continuous">
+		<axis xyz="1 0 0"/>
+		<parent link="base_link"/>
+		<child link="left_wheel"/>
+		<origin rpy="0 0 1.570796" xyz="0.01748 -0.045 -0.00874"/>
+	</joint>
+
+	<joint name="caster_joint" type="fixed">
+		<parent link="base_link" />
+		<child link="caster" />
+		<origin xyz="-0.07387 0 -0.0015" />
+	</joint>
+
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/</robotNamespace>
+		</plugin>
+	</gazebo>
+
+	<transmission name="right_wheel_trans">
+		<type>transmission_interface/SimpleTransmission</type>
+		<actuator name="right_wheel_motor">
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+		<joint name="base_to_right_wheel">
+			<hardwareInterface>VelocityJointInterface</hardwareInterface>
+		</joint>
+	</transmission>
+
+	<transmission name="left_wheel_trans">
+		<type>transmission_interface/SimpleTransmission</type>
+		<actuator name="left_wheel_motor">
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+		<joint name="base_to_left_wheel">
+			<hardwareInterface>VelocityJointInterface</hardwareInterface>
+		</joint>
+	</transmission>
+
+	<gazebo reference="right_wheel">
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="10000000.0"/>
+		<kd value="1.0"/>
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+	<gazebo reference="left_wheel">
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="10000000.0"/>
+		<kd value="1.0"/>
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+</robot>

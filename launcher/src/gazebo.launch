@@ -1,0 +1,48 @@
+<launch>
+
+	<arg name="model" default="$(find my_urdf)/my_robot.urdf"/>
+	<arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+
+	<arg name="paused" default="false"/>
+	<arg name="use_sim_time" default="true" />
+	<arg name="gui" default="true"/>
+	<arg name="headless" default="false"/>
+	<arg name="debug" default="false"/>
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="debug" value="$(arg debug)"/>
+		<arg name="gui" value="$(arg gui)"/>
+		<arg name="paused" value="$(arg paused)"/>
+		<arg name="use_sim_time" value="$(arg use_sim_time)"/>
+		<arg name="headless" value="$(arg headless)"/>
+	</include>
+
+	<param name="robot_description" textfile="$(arg model)"/>
+
+	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" 
+          args="-z 10. -unpause -urdf -model robot -param robot_description" 
+          respawn="false" output="screen"/>
+
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+		<param name="publish_frequency" type="double" value="30.0"/>
+	</node>
+
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
+
+	<rosparam command="load"
+			  file="$(find my_urdf)/config/joints.yaml"
+			  ns="my_robot_joint_state_controller"/>
+	<rosparam command="load"
+			  file="$(find my_urdf)/config/diffdrive.yaml"
+			  ns="my_robot_diff_drive_controller"/>
+
+	<node name="my_robot_controller_spawner" pkg="controller_manager" type="spawner"
+		  args="my_robot_joint_state_controller
+				my_robot_diff_drive_controller
+				--shutdown-timeout 3"/>
+
+	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+		<param name="default_topic" value="/my_robot_diff_drive_controller/cmd_vel"/>
+	</node>
+
+</launch>
